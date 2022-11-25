@@ -160,7 +160,7 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
 | username | YES | NONE | String | starrocks connecting username |
 | password | YES | NONE | String | starrocks connecting password |
 | sink.semantic | NO | **at-least-once** | String | **at-least-once** or **exactly-once**(**flush at checkpoint only** and options like **sink.buffer-flush.*** won't work either). |
-| sink.version | NO | AUTO | String | The version of implementaion for exactly-once. Only availible for connector 1.2.4+. If `V2`, use StarRocks' stream load transaction interface which requires StarRocks 2.4+. If `V1`, use stream load non-transaction interface. If `AUTO`, connector will choose the stream load transaction interface automatically if the StarRocks supports the feature, otherwise choose non-transaction interface. |
+| sink.version | NO | AUTO | String | The version of implementaion for sink exactly-once. Only availible for connector 1.2.4+. If `V2`, use StarRocks' stream load transaction interface which requires StarRocks 2.4+. If `V1`, use stream load non-transaction interface. If `AUTO`, connector will choose the stream load transaction interface automatically if the StarRocks supports the feature, otherwise choose non-transaction interface. |
 | sink.buffer-flush.max-bytes | NO | 94371840(90M) | String | the max batching size of the serialized data, range: **[64MB, 10GB]**. |
 | sink.buffer-flush.max-rows | NO | 500000 | String | the max batching rows, range: **[64,000, 5000,000]**. |
 | sink.buffer-flush.interval-ms | NO | 300000 | String | the flushing time interval, range: **[1000ms, 3600000ms]**. |
