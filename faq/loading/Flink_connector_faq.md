@@ -32,7 +32,6 @@ com.starrocks.data.load.stream.exception.StreamLoadFailException: {
 
 需要将timeout调整大于checkpoint interval
 
-
 ## flink-connector-jdbc_2.11sink到StarRocks时间落后8小时
 
 **问题描述：**
