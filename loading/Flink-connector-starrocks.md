@@ -198,8 +198,13 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
 
 ## 注意事项
 
-* StarRocks从2.4.0开始支持[Stream Load事务接口](StreamLoad.md)，Sink基于该接口重新设计实现了exactly-once，相较于原来基于非事务接口的实现，降低了内存使用和checkpoint耗时，提高了作业的实时性和稳定性。使用该功能需要同时升级StarRocks到2.4+版本，以及Flink connecotr到1.2.4+版本，升级后默认使用事务接口实现，也可以通过配置`sink.version`为`V1`继续使用非事务接口。如果只升级StarRocks或Flink connector，sink会自动选择非事务接口实现。
-* 使用Stream Load事务接口的exactly-once如果遇到异常`"Message": "timeout by txn manager"`，可能是因为`sink.properties.timeout`小于Flink checkpoint interval，导致事务超时，需要将timeout调整大于checkpoint interval
+*   自 2.4 版本 StarRocks 开始支持[ Stream Load 事务接口](./stream_load_transaction_interface.md)。自 Flink connector 1.2.4 版本起， Sink 基于事务接口重新设计实现了 exactly-once，相较于原来基于非事务接口的实现，降低了内存使用和 checkpoint 耗时，提高了作业的实时性和稳定性。
+   自 Flink connector 1.2.4 版本起，sink 默认使用事务接口实现。如果需要使用非事务接口实现，则需要配置 `sink.version` 为`V1`。
+   > **注意**
+   >
+   > 如果只升级 StarRocks 或 Flink connector，sink 会自动选择非事务接口实现。
+   
+* 使用事务接口的 exactly-once 时，如果遇到异常`"Message": "timeout by txn manager"`，可能是因为`sink.properties.timeout`小于Flink checkpoint interval，导致事务超时，需要将timeout调整大于checkpoint interval
 ```
 com.starrocks.data.load.stream.exception.StreamLoadFailException: {
     "TxnId": 33823381,
