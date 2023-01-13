@@ -198,32 +198,11 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
 
 ## 注意事项
 
-*   自 2.4 版本 StarRocks 开始支持[ Stream Load 事务接口](./stream_load_transaction_interface.md)。自 Flink connector 1.2.4 版本起， Sink 基于事务接口重新设计实现了 exactly-once，相较于原来基于非事务接口的实现，降低了内存使用和 checkpoint 耗时，提高了作业的实时性和稳定性。
-   自 Flink connector 1.2.4 版本起，sink 默认使用事务接口实现。如果需要使用非事务接口实现，则需要配置 `sink.version` 为`V1`。
+* 自 2.4 版本 StarRocks 开始支持[ Stream Load 事务接口](./stream_load_transaction_interface.md)。自 Flink connector 1.2.4 版本起， Sink 基于事务接口重新设计实现了 exactly-once，相较于原来基于非事务接口的实现，降低了内存使用和 checkpoint 耗时，提高了作业的实时性和稳定性。
+  自 Flink connector 1.2.4 版本起，sink 默认使用事务接口实现。如果需要使用非事务接口实现，则需要配置 `sink.version` 为`V1`。
    > **注意**
    >
    > 如果只升级 StarRocks 或 Flink connector，sink 会自动选择非事务接口实现。
-   
-* 使用事务接口的 exactly-once 时，如果遇到异常`"Message": "timeout by txn manager"`，可能是因为`sink.properties.timeout`小于Flink checkpoint interval，导致事务超时，需要将timeout调整大于checkpoint interval
-```
-com.starrocks.data.load.stream.exception.StreamLoadFailException: {
-    "TxnId": 33823381,
-    "Label": "502c2770-cd48-423d-b6b7-9d8f9a59e41a",
-    "Status": "Fail",
-    "Message": "timeout by txn manager",
-    "NumberTotalRows": 1637,
-    "NumberLoadedRows": 1637,
-    "NumberFilteredRows": 0,
-    "NumberUnselectedRows": 0,
-    "LoadBytes": 4284214,
-    "LoadTimeMs": 120294,
-    "BeginTxnTimeMs": 0,
-    "StreamLoadPlanTimeMs": 7,
-    "ReadDataTimeMs": 9,
-    "WriteDataTimeMs": 120278,
-    "CommitAndPublishTimeMs": 0
-}
-```
 
 * 基于Stream Load非事务接口实现的exactly-once，依赖flink的checkpoint-interval在每次checkpoint时保存批数据以及其label，在checkpoint完成后的第一次invoke中阻塞flush所有缓存在state当中的数据，以此达到精准一次。但如果StarRocks挂掉了，会导致用户的flink sink stream 算子长时间阻塞，并引起flink的监控报警或强制kill。
 
