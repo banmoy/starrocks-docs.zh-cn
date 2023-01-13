@@ -4,7 +4,7 @@
 
 **问题描述：**
 
-```
+```plaintext
 com.starrocks.data.load.stream.exception.StreamLoadFailException: {
     "TxnId": 33823381,
     "Label": "502c2770-cd48-423d-b6b7-9d8f9a59e41a",
