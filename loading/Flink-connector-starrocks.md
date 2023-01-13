@@ -198,7 +198,7 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
 
 ## 注意事项
 
-* 自 2.4 版本 StarRocks 开始支持[ Stream Load 事务接口](./stream_load_transaction_interface.md)。自 Flink connector 1.2.4 版本起， Sink 基于事务接口重新设计实现了 exactly-once，相较于原来基于非事务接口的实现，降低了内存使用和 checkpoint 耗时，提高了作业的实时性和稳定性。
+* 自 2.4 版本 StarRocks 开始支持[Stream Load 事务接口](./stream_load_transaction_interface.md)。自 Flink connector 1.2.4 版本起， Sink 基于事务接口重新设计实现了 exactly-once，相较于原来基于非事务接口的实现，降低了内存使用和 checkpoint 耗时，提高了作业的实时性和稳定性。
   自 Flink connector 1.2.4 版本起，sink 默认使用事务接口实现。如果需要使用非事务接口实现，则需要配置 `sink.version` 为`V1`。
    > **注意**
    >
@@ -228,4 +228,5 @@ flink-connector-starrocks 导入底层调用的 Stream Load实现，可以在 fl
 * 日志中如果没有上述信息，请在 [StarRocks 论坛](https://forum.starrocks.com/) 提问，我们会及时跟进。
 
 ## 常见问题
-请参见 [ FLink Connector 常见问题](../faq/loading/Flink_connector_faq)。
+
+请参见 [FLink Connector 常见问题](../faq/loading/Flink_connector_faq)。
