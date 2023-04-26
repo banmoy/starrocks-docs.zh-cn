@@ -64,11 +64,9 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
                 // .withProperty("sink.properties.columns", "k1,k2,k3")
                 .withProperty("sink.properties.format", "json")
                 .withProperty("sink.properties.strip_outer_array", "true")
-                // 设置并行度，多并行度情况下需要考虑如何保证数据有序性
-                .withProperty("sink.parallelism", "1")
                 .build()
         )
-    );
+    ).setParallelism(1); // 设置并行度，多并行度情况下需要考虑如何保证数据有序性
 
     // -------- 原始数据为 CSV 格式 --------
     class RowData {
@@ -140,8 +138,9 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
             // "'sink.properties.columns' = 'k1,k2,k3,__op'," + 
             "'sink.properties.column_separator' = '\\x01'," +
             "'sink.properties.row_delimiter' = '\\x02'," +
-            "'sink.properties.*' = 'xxx'" + // stream load properties like `'sink.properties.columns' = 'k1, v1'`
-            "'sink.max-retries' = '3'" +
+            "'sink.properties.*' = 'xxx'," + // stream load properties like `'sink.properties.columns' = 'k1, v1'`
+            "'sink.max-retries' = '3'," +
+            "'sink.parallelism' = '1'" // 设置并行度，多并行度情况下需要考虑如何保证数据有序性
         ")"
     );
     ```
