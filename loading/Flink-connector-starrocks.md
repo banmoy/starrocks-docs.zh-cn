@@ -59,7 +59,7 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
                 .withProperty("username", "xxx")
                 .withProperty("password", "xxx")
                 .withProperty("table-name", "xxx")
-                //  自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列，并且需要在 'sink.properties.columns' 的最后显式添加 '__op'列。
+                //  自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列，并且需要在 'sink.properties.columns' 的最后显式添加 '__op' 列。
                 // .withProperty("sink.properties.partial_update", "true")
                 // .withProperty("sink.properties.columns", "k1,k2,k3,__op")
                 .withProperty("sink.properties.format", "json")
@@ -96,7 +96,7 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
                 .withProperty("password", "xxx")
                 .withProperty("table-name", "xxx")
                 .withProperty("database-name", "xxx")
-                //  自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列，并且需要在 'sink.properties.columns' 的最后显式添加 '__op'列。
+                //  自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列，并且需要在 'sink.properties.columns' 的最后显式添加 '__op' 列。
                 // .withProperty("sink.properties.partial_update", "true")
                 // .withProperty("sink.properties.columns", "k1,k2,k3,__op")
                 .withProperty("sink.properties.column_separator", "\\x01")
