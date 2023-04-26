@@ -59,14 +59,14 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
                 .withProperty("username", "xxx")
                 .withProperty("password", "xxx")
                 .withProperty("table-name", "xxx")
-                // 自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列。
+                //  自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列，并且需要在 'sink.properties.columns' 的最后显式添加 '__op'列。
                 // .withProperty("sink.properties.partial_update", "true")
-                // .withProperty("sink.properties.columns", "k1,k2,k3")
+                // .withProperty("sink.properties.columns", "k1,k2,k3,__op")
                 .withProperty("sink.properties.format", "json")
                 .withProperty("sink.properties.strip_outer_array", "true")
                 .build()
         )
-    ).setParallelism(1); // 设置并行度，多并行度情况下需要考虑如何保证数据有序性
+    ).setParallelism(1); // 设置并行度，多并行度情况下需要考虑如何保证数据有序性。
 
     // -------- 原始数据为 CSV 格式 --------
     class RowData {
@@ -96,9 +96,9 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
                 .withProperty("password", "xxx")
                 .withProperty("table-name", "xxx")
                 .withProperty("database-name", "xxx")
-                // 自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列。
+                //  自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列，并且需要在 'sink.properties.columns' 的最后显式添加 '__op'列。
                 // .withProperty("sink.properties.partial_update", "true")
-                // .withProperty("sink.properties.columns", "k1,k2,k3")
+                // .withProperty("sink.properties.columns", "k1,k2,k3,__op")
                 .withProperty("sink.properties.column_separator", "\\x01")
                 .withProperty("sink.properties.row_delimiter", "\\x02")
                 .build(),
@@ -133,7 +133,7 @@ flink-connector-starrocks 的内部实现是通过缓存并批量由 Stream Load
             "'sink.buffer-flush.max-rows' = '1000000'," +
             "'sink.buffer-flush.max-bytes' = '300000000'," +
             "'sink.buffer-flush.interval-ms' = '5000'," +
-            // 自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列，并且 'sink.properties.columns' 的最后显式添加 '__op'列。
+            // 自 2.4 版本，支持更新主键模型中的部分列。您可以通过以下两个属性指定需要更新的列，并且需要在 'sink.properties.columns' 的最后显式添加 '__op' 列。
             // "'sink.properties.partial_update' = 'true'," +
             // "'sink.properties.columns' = 'k1,k2,k3,__op'," + 
             "'sink.properties.column_separator' = '\\x01'," +
