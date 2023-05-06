@@ -28,9 +28,11 @@ Spark 连接器支持三种数据读取方式：Spark SQL、Spark DataFrame 和 
 已部署 Spark。
 
 ## 准备工作
-您可以直接下载已经编译好的connector jar，或者通过源码手动编译。
+
+您可以直接下载已经编译好的 connector jar 包，或者通过源码手动编译。
 
 ### 直接下载
+
 * [Spark 2.x](https://cdn-thirdparty.starrocks.com/spark/starrocks-spark2_2.11-1.0.0.jar)
 * [Spark 3.x](https://cdn-thirdparty.starrocks.com/spark/starrocks-spark3_2.12-1.0.0.jar)
 
