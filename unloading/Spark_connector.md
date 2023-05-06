@@ -57,7 +57,6 @@ Spark 连接器支持三种数据读取方式：Spark SQL、Spark DataFrame 和 
    - 如果您的 Spark 以 `Local` 模式运行，需要把该文件放在 `jars/` 路径下。
    - 如果您的 Spark 以 `Yarn` 模式运行，需要把该文件放在预安装程序包 (Pre-deployment Package) 里。
 
-
 把文件放置到指定位置后，才可以开始使用 Spark 连接器读取数据。
 
 ## 参数说明
