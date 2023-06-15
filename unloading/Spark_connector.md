@@ -10,8 +10,6 @@ Spark 连接器支持三种数据读取方式：Spark SQL、Spark DataFrame 和 
 
 ## 使用说明
 
-- 当前版本只支持从 StarRocks 中读取数据，不支持从 Sink 写入数据到 StarRocks 中。
-
 - 支持在 StarRocks 端完成数据过滤，从而减少数据传输量。
 
 - 如果读取数据的开销比较大，可以通过合理的表设计和使用过滤条件，控制 Spark不要一次读取过多的数据，从而避免给磁盘和网络造成过大的 I/O 压力或影响正常的查询业务。
@@ -20,6 +18,7 @@ Spark 连接器支持三种数据读取方式：Spark SQL、Spark DataFrame 和 
 
 | Spark 连接器 | Spark | StarRocks    | Java | Scala |
 | ------------ | ----- | ------------ | ---- | ----- |
+| v1.1.1       | 
 | v1.0.0       | v2.x  | v1.18 及以上 | v8   | v2.11 |
 | v1.0.0       | v3.x  | v1.18 及以上 | v8   | v2.12 |
 
