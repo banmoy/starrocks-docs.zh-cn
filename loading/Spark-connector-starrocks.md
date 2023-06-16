@@ -275,8 +275,8 @@ spark.stop();
 CREATE TABLE `score_board`
 USING starrocks
 OPTIONS(
-   "starrocks.fenodes"="127.0.0.1:11901",
-   "starrocks.fe.jdbc.url"="jdbc:mysql://127.0.0.1:11903",
+   "starrocks.fenodes"="xxxxxx",
+   "starrocks.fe.jdbc.url"="xxxxxx",
    "starrocks.table.identifier"="test.score_board",
    "starrocks.user"="xxxxxx",
    "spark.starrocks.password"="xxxxxx"
