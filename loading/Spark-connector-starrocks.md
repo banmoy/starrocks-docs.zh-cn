@@ -237,7 +237,7 @@ Dataset<Row> df = lines.as(Encoders.STRING())
         .map((MapFunction<String, Row>) line -> RowFactory.create(line.split(",")))
         .schema(schema);
 
-// 3. create starrocks writer with the necessary options.
+// 4. create starrocks writer with the necessary options.
 // The format for the writer is "starrocks"
 
 Map<String, String> options = new HashMap<>();
