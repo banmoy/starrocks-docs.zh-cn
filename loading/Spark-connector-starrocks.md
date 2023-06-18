@@ -92,21 +92,21 @@ connector jar包的命名格式如下
 
 ## 数据类型映射
 
-| StarRocks 数据类型 | Spark 数据类型           |
-|----------------|----------------------|
-| BOOLEAN        | BooleanType          |
-| TINYINT        | ByteType             |
-| SMALLINT       | ShortType            |
-| INT            | IntegerType          |
-| BIGINT         | LongType             |
-| LARGEINT       | StringType           |
-| FLOAT          | FloatType            |
-| DOUBLE         | DoubleType           |
-| DECIMAL        | DecimalType          |
-| CHAR           | CharType             |
-| VARCHAR        | VarcharType |
-| STRING         | StringType            |
-| DATE           | DateType |
+| StarRocks 数据类型 | Spark 数据类型    |
+|----------------|---------------|
+| BOOLEAN        | BooleanType   |
+| TINYINT        | ByteType      |
+| SMALLINT       | ShortType     |
+| INT            | IntegerType   |
+| BIGINT         | LongType      |
+| LARGEINT       | StringType    |
+| FLOAT          | FloatType     |
+| DOUBLE         | DoubleType    |
+| DECIMAL        | DecimalType   |
+| CHAR           | StringType    |
+| VARCHAR        | StringType    |
+| STRING         | StringType    |
+| DATE           | DateType      |
 | DATETIME       | TimestampType |
 
 
