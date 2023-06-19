@@ -88,7 +88,7 @@ connector jar包的命名格式如下
 | starrocks.write.properties.format              | 否      | CSV | 指定stream load导入数据使用的格式，取值为CSV 和 JSON。connector会将每批数据转换成相应的格式发送给StarRocks。                                                                                                                                             |
 | starrocks.write.properties.row_delimiter       | 否      | \n | 使用CSV格式导入时，用于指定行分隔符。                                                                                                                                                                                                  |
 | starrocks.write.properties.column_separator    | 否      | \t | 使用CSV格式导入时，用于指定列分隔符。                                                                                                                                                                                                  |
-| starrocks.write.num.partitions                 | 否      | 无 | Spark用于并行写入的分区数。数据量小时可以通过减少分区数降低导入并发和频率。默认分区数由Spark决定。                                                                                                                                                                |
+| starrocks.write.num.partitions                 | 否      | 无 | Spark用于并行写入的分区数，数据量小时可以通过减少分区数降低导入并发和频率，默认分区数由Spark决定。使用该功能可能会引入 Spark Shuffle cost。                                                                                                                                  |
 | starrocks.write.partition.columns              | 否      | 无 | 用于Spark分区的列，只有指定 starrocks.write.num.partitions 后才有效，如果不指定则使用所有写入的列进行分区                                                                                                                                               |
 
 
