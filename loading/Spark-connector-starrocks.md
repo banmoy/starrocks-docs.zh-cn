@@ -74,7 +74,7 @@ connector jar包的命名格式如下
 
 | 参数                                             | 是否必填   | 默认值 | 描述                                                                                                                                                                                                                    |
 |------------------------------------------------|-------- | ---- |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| starrocks.fenodes                              | 是      | 无 | FE 的 HTTP 地址，支持输入多个FE地址，使用逗号 , 分隔。格式为 <fe_host1>:<fe_http_port1>,<fe_host2>:<fe_http_port2>。                                                                                                                          |
+| starrocks.fe.http.url                          | 是      | 无 | FE 的 HTTP 地址，支持输入多个FE地址，使用逗号 , 分隔。格式为 <fe_host1>:<fe_http_port1>,<fe_host2>:<fe_http_port2>。                                                                                                                          |
 | starrocks.fe.jdbc.url                          | 是      | 无 | FE 的 MySQL Server 连接地址。格式为 jdbc:mysql://<fe_host>:<fe_query_port>。                                                                                                                                                    |
 | starrocks.table.identifier                     | 是      | 无 | StarRocks 目标表的名称，格式为 <database_name>.<table_name>。                                                                                                                                                                    |
 | starrocks.user                                 | 是      | 无 | StarRocks 集群账号的用户名。                                                                                                                                                                                                   |
@@ -174,7 +174,7 @@ Dataset<Row> df = spark.createDataFrame(data, schema);
 
 Map<String, String> options = new HashMap<>();
 // FE http url like "127.0.0.1:11901"
-options.put("starrocks.fenodes", "xxxxxx");
+options.put("starrocks.fe.http.url", "xxxxxx");
 // FE jdbc url like "jdbc:mysql://127.0.0.1:11903"
 options.put("starrocks.fe.jdbc.url", "xxxxxx");
 // table identifier
@@ -244,7 +244,7 @@ Dataset<Row> df = lines.as(Encoders.STRING())
 
 Map<String, String> options = new HashMap<>();
 // FE http url like "127.0.0.1:11901"
-options.put("starrocks.fenodes", "xxxxxx");
+options.put("starrocks.fe.http.url", "xxxxxx");
 // FE jdbc url like "jdbc:mysql://127.0.0.1:11903"
 options.put("starrocks.fe.jdbc.url", "xxxxxx");
 // table identifier
@@ -277,7 +277,7 @@ spark.stop();
 CREATE TABLE `score_board`
 USING starrocks
 OPTIONS(
-   "starrocks.fenodes"="xxxxxx",
+   "starrocks.fe.http.url"="xxxxxx",
    "starrocks.fe.jdbc.url"="xxxxxx",
    "starrocks.table.identifier"="test.score_board",
    "starrocks.user"="xxxxxx",
