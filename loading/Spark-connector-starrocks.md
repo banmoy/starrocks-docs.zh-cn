@@ -142,55 +142,40 @@ PROPERTIES (
 
 ### 使用 Spark DataFrame 写入数据
 
-下面分别介绍在 Batch 和 Structured Streaming 下如何写入数据，示例的项目构建、编译和运行请参考 [Spark Application](https://spark.apache.org/docs/3.2.0/quick-start.html#self-contained-applications)。
+下面分别介绍在 Batch 和 Structured Streaming 下如何写入数据。
 
 #### Batch
 
-该例子演示了在内存中构造数据并写入 StarRocks 表，编译后运行即可，然后在 StarRocks 中查询数据进行验证。
+该例子演示了在内存中构造数据并写入 StarRocks 表。
 
-```java
-// 1. create a spark session
-SparkSession spark = SparkSession
-        .builder()
-        .master("local[1]")
-        .appName("SimpleWrite")
-        .getOrCreate();
+1. 在 `spark-shell` 中运行示例
+```scala
+// 1. create a DataFrame from a sequence
+val data = Seq((1, "starrocks", 100), (2, "spark", 100))
+val df = data.toDF("id", "name", "score")
 
-// 2. create a source DataFrame from a list of data, and define
-// the schema which is mapped to the StarRocks table
-List<Row> data = Arrays.asList(
-        RowFactory.create(1, "row1", 1),
-        RowFactory.create(2, "row2", 2)
-);
-StructType schema = new StructType(new StructField[] {
-        new StructField("id", DataTypes.IntegerType, false, Metadata.empty()),
-        new StructField("name", DataTypes.StringType, true, Metadata.empty()),
-        new StructField("score", DataTypes.IntegerType, true, Metadata.empty())
-});
-Dataset<Row> df = spark.createDataFrame(data, schema);
+// 2. write to starrocks with the format "starrocks",
+// and replace the options with your own
+df.write.format("starrocks")
+     .option("starrocks.fe.http.url", "127.0.0.1:8038")
+     .option("starrocks.fe.jdbc.url", "jdbc:mysql://127.0.0.1:9038")
+     .option("starrocks.table.identifier", "test.score_board")
+     .option("starrocks.user", "root")
+     .option("starrocks.password", "")
+     .mode("append")
+     .save()
+```
 
-// 3. create starrocks writer with the necessary options.
-// The format for the writer is "starrocks"
-
-Map<String, String> options = new HashMap<>();
-// FE http url like "127.0.0.1:11901"
-options.put("starrocks.fe.http.url", "xxxxxx");
-// FE jdbc url like "jdbc:mysql://127.0.0.1:11903"
-options.put("starrocks.fe.jdbc.url", "xxxxxx");
-// table identifier
-options.put("starrocks.table.identifier", "test.score_board");
-// starrocks username
-options.put("starrocks.user", "root");
-// starrocks password
-options.put("starrocks.password", "");
-
-// The format should be "starrocks"
-df.write().format("starrocks")
-        .mode(SaveMode.Append)
-        .options(options)
-        .save();
-
-spark.stop();
+2. 在 StarRocks中查询结果
+```SQL
+MySQL [test]> SELECT * FROM `score_board`;
++------+-----------+-------+
+| id   | name      | score |
++------+-----------+-------+
+|    1 | starrocks |   100 |
+|    2 | spark     |   100 |
++------+-----------+-------+
+2 rows in set (0.00 sec)
 ```
 
 #### Structured Streaming
