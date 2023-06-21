@@ -67,8 +67,8 @@ connector jar包的命名格式如下
       sh build.sh 3.2
       ```
 
-3. 编译完成后，`target/` 目录下会生成 connector jar 包，比如 `starrocks-spark-connector-3.2_2.12-1.1.0.jar`。
-
+3. 编译完成后，`target/` 目录下会生成 connector jar 包，比如 `starrocks-spark-connector-3.2_2.12-1.1.0-SNAPSHOT.jar`。
+> **_注意:_** 非正式发布的connector版本会带有`SNAPSHOT`后缀
 
 ## 参数说明
 
