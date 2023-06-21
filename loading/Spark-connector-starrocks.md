@@ -281,7 +281,7 @@ OPTIONS(
    "starrocks.fe.jdbc.url"="xxxxxx",
    "starrocks.table.identifier"="test.score_board",
    "starrocks.user"="xxxxxx",
-   "spark.starrocks.password"="xxxxxx"
+   "starrocks.password"="xxxxxx"
 );
 
 -- 2. insert two rows into the table
