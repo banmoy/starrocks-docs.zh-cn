@@ -114,11 +114,13 @@ connector jar包的命名格式如下
 
 ## 使用示例
 
-通过一个简单的例子说明如何使用 connector 写入 StarRocks 表，包括使用 Spark DataFrame 和 Spark SQL，其中 DataFrame 包括 Batch 和 Structured Streaming 两种模式。
+通过一个例子说明如何使用 connector 写入 StarRocks 表，包括使用 Spark DataFrame 和 Spark SQL，其中 DataFrame 包括 Batch 和 Structured Streaming 两种模式。
 
-更多示例请参考 [Spark Connector Examples](https://github.com/StarRocks/starrocks-connector-for-apache-spark/tree/main/src/test/java/com/starrocks/connector/spark/examples)，将持续补充更多例子。
+更多示例请参考 [Spark Connector Examples](https://github.com/StarRocks/starrocks-connector-for-apache-spark/tree/main/src/test/java/com/starrocks/connector/spark/examples)，后续会补充更多例子。
 
-### 创建StarRocks表
+### 准备工作 
+
+#### 创建StarRocks表
 
 创建数据库 `test`，并在其中创建名为 `score_board` 的主键表。
 
@@ -140,6 +142,10 @@ PROPERTIES (
 );
 ```
 
+#### Spark 环境
+ 
+示例基于 Spark 3.2.4，使用 `spark-shell` 和 `spark-sql` 进行演示，运行前请将 connector jar放置在 ` $SPARK_HOME/jars` 目录下。
+
 ### 使用 Spark DataFrame 写入数据
 
 下面分别介绍在 Batch 和 Structured Streaming 下如何写入数据。
@@ -149,6 +155,7 @@ PROPERTIES (
 该例子演示了在内存中构造数据并写入 StarRocks 表。
 
 1. 在 `spark-shell` 中运行示例
+
 ```scala
 // 1. create a DataFrame from a sequence
 val data = Seq((1, "starrocks", 100), (2, "spark", 100))
@@ -167,6 +174,7 @@ df.write.format("starrocks")
 ```
 
 2. 在 StarRocks中查询结果
+
 ```SQL
 MySQL [test]> SELECT * FROM `score_board`;
 +------+-----------+-------+
@@ -180,95 +188,92 @@ MySQL [test]> SELECT * FROM `score_board`;
 
 #### Structured Streaming
 
-该例子演示了通过 socket 持续接收数据，并写入 StarRocks，该示例参考 [Spark WordCount](https://spark.apache.org/docs/3.2.0/structured-streaming-programming-guide.html#overview)。
-运行步骤如下
-1. 在一个终端上运行 `Netcat` 工具，启动一个 server 用来接收数据，命令如下
-```shell
-$ nc -lk 9999
-```
+该例子演示了在从csv文件流式读取数据并写入 StarRocks 表。
 
-2. 运行示例，其中的 `socket` DataSource 将连接到 `Netcat` server，并接收数据
-3. 在 `Netcat` 的终端输入多行 csv 格式的数据
+1. 在目录 `csv-data` 下创建 csv 文件 `test.csv`，数据如下
+
 ```text
-3,row3,3
-4,row4,4
+3,starrocks,100
+4,spark,100
 ```
-4. 停止 server，并在 StarRocks 中查询验证结果。 
 
+2. 在 `spark-shell` 中运行示例
 
-```java
- // 1. create a spark session
-SparkSession spark = SparkSession
-        .builder()
-        .master("local[1]")
-        .appName("SimpleWrite")
-        .getOrCreate();
+```scala
+import org.apache.spark.sql.types.StructType
 
- // 2. create a streaming source DataFrame from a server, it will receive
- // text lines continuously. Each line is a row in starrocks table, and in
- // csv format such as "3,row3,3"
- Dataset<Row> lines = spark.readStream()
-        .format("socket")
-        .option("host", "localhost")
-        .option("port", 9999)
-        .load();
+// 1. create a DataFrame from a sequence
+val schema = (new StructType()
+        .add("id", "integer")
+        .add("name", "string")
+        .add("score", "integer")
+     )
+val df = (spark.readStream
+        .option("sep", ",")
+        .schema(schema)
+        .format("csv") 
+        // replace it with you path to the directory "csv-data"
+        .load("/path/to/csv-data")
+     )
 
-// 3. split each csv line to a row, and create a DataFrame with the schema
-// mapped to the StarRocks table
-StructType schema = new StructType(new StructField[] {
-        new StructField("id", DataTypes.IntegerType, false, Metadata.empty()),
-        new StructField("name", DataTypes.StringType, false, Metadata.empty()),
-        new StructField("score", DataTypes.IntegerType, false, Metadata.empty())
-});
-Dataset<Row> df = lines.as(Encoders.STRING())
-        .map((MapFunction<String, Row>) line -> RowFactory.create(line.split(",")))
-        .schema(schema);
+// 2. write to starrocks with the format "starrocks", and replace the options with your own
+val query = (df.writeStream.format("starrocks")
+        .option("starrocks.fe.http.url", "127.0.0.1:8038")
+        .option("starrocks.fe.jdbc.url", "jdbc:mysql://127.0.0.1:9038")
+        .option("starrocks.table.identifier", "test.score_board")
+        .option("starrocks.user", "root")
+        .option("starrocks.password", "")
+        // replace it with you checkpoint directory
+        .option("checkpointLocation", "/path/to/checkpoint")
+        .outputMode("append")
+        .start()
+     )
+```
 
-// 4. create starrocks writer with the necessary options.
-// The format for the writer is "starrocks"
+3. 在 StarRocks中查询结果
 
-Map<String, String> options = new HashMap<>();
-// FE http url like "127.0.0.1:11901"
-options.put("starrocks.fe.http.url", "xxxxxx");
-// FE jdbc url like "jdbc:mysql://127.0.0.1:11903"
-options.put("starrocks.fe.jdbc.url", "xxxxxx");
-// table identifier
-options.put("starrocks.table.identifier", "xxxxxx");
-// starrocks username
-options.put("starrocks.user", "xxxxxx");
-// starrocks password
-options.put("starrocks.password", "xxxxxx");
-
-StreamingQuery query = df.writeStream()
-        // The format should be "starrocks"
-        .format("starrocks")
-        .outputMode(OutputMode.Append())
-        .options(options)
-        // set your checkpoint location
-        .option("checkpointLocation", "xxxxxx")
-        .start();
-
-query.awaitTermination();
-
-spark.stop();
+```SQL
+MySQL [test]> select * from score_board;
++------+-----------+-------+
+| id   | name      | score |
++------+-----------+-------+
+|    4 | spark     |   100 |
+|    3 | starrocks |   100 |
++------+-----------+-------+
+2 rows in set (0.67 sec)
 ```
 
 ### 使用 Spark SQL 写入数据
 
 该例子演示使用 `INSERT INTO` 写入数据，可以通过 [Spark SQL CLI](https://spark.apache.org/docs/latest/sql-distributed-sql-engine-spark-sql-cli.html) 运行该示例。
 
+1. 在 `spark-sql` 中运行示例
+
 ```SQL
--- 1. create a table using datasource "starrocks"
+-- 1. create a table using datasource "starrocks", and replace the options with your own
 CREATE TABLE `score_board`
 USING starrocks
 OPTIONS(
-   "starrocks.fe.http.url"="xxxxxx",
-   "starrocks.fe.jdbc.url"="xxxxxx",
+   "starrocks.fe.http.url"="127.0.0.1:8038",
+   "starrocks.fe.jdbc.url"="jdbc:mysql://127.0.0.1:9038",
    "starrocks.table.identifier"="test.score_board",
-   "starrocks.user"="xxxxxx",
-   "starrocks.password"="xxxxxx"
+   "starrocks.user"="root",
+   "starrocks.password"=""
 );
 
 -- 2. insert two rows into the table
-INSERT INTO `score_board` VALUES (5, "row5", 5), (6, "row6", 6);
+INSERT INTO `score_board` VALUES (5, "starrocks", 100), (6, "spark", 100);
+```
+
+2. 在 StarRocks 中查询结果
+
+```SQL
+MySQL [test]> select * from score_board;
++------+-----------+-------+
+| id   | name      | score |
++------+-----------+-------+
+|    6 | spark     |   100 |
+|    5 | starrocks |   100 |
++------+-----------+-------+
+2 rows in set (0.00 sec)
 ```
