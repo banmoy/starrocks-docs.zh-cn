@@ -10,45 +10,106 @@ Spark 连接器支持三种数据读取方式：Spark SQL、Spark DataFrame 和 
 
 ## 使用说明
 
-- 当前版本只支持从 StarRocks 中读取数据，不支持从 Sink 写入数据到 StarRocks 中。
-
 - 支持在 StarRocks 端完成数据过滤，从而减少数据传输量。
 
 - 如果读取数据的开销比较大，可以通过合理的表设计和使用过滤条件，控制 Spark不要一次读取过多的数据，从而避免给磁盘和网络造成过大的 I/O 压力或影响正常的查询业务。
 
 ## 版本要求
 
-| Spark 连接器 | Spark | StarRocks    | Java | Scala |
-| ------------ | ----- | ------------ | ---- | ----- |
-| v1.0.0       | v2.x  | v1.18 及以上 | v8   | v2.11 |
-| v1.0.0       | v3.x  | v1.18 及以上 | v8   | v2.12 |
+| Spark 连接器 | Spark         | StarRocks | Java | Scala |
+|-----------|---------------|-----------|-----|------|
+| 1.1.0     | 3.2, 3.3, 3.4 | 2.4 及以上   | 8   | 2.12 |
+| 1.0.0     | 2.x           | 1.18 及以上  | 8   | 2.11 |
+| 1.0.0     | 3.x           | 1.18 及以上  | 8   | 2.12 |
 
-## 前提条件
+> **_注意:_** 
+> * 1.0.0 版本只支持读取 StarRocks，从 1.1.0 版本开始同时支持读写 StarRocks。
+> * 1.0.0 和 1.1.0 在参数和类型映射上存在差别，请参考[Connector升级](#connector升级)。
+> * 1.0.0 版本一般情况下不再增加新功能，条件允许请尽快升级 connector。
 
-已部署 Spark。
+## 获取 Connector
 
-## 准备工作
+您可以通过以下方式获取 connector jar 包
+* 直接下载已经编译好的jar
+* 通过 Maven 添加 connector 依赖 (仅支持 1.1.0 及以上版本)
+* 通过源码手动编译
 
-您可以直接下载已经编译好的 Spark connector jar 包，或者通过源码手动编译。
+### 1.1.0 及以上版本
 
-### 直接下载
+connector jar包的命名格式如下
+
+`starrocks-spark-connector-${spark_version}_${scala_version}-${connector_version}.jar`
+
+比如，想在 Spark 3.2 和 scala 2.12 上使用 1.1.0 版本的 connector，可以选择 `starrocks-spark-connector-3.2_2.12-1.1.0.jar`。
+
+> **_注意:_** 一般情况下最新版本的 connector 只维护最近3个版本的 Spark。
+
+#### 直接下载
+
+可以在 [Maven Central Repository](https://repo1.maven.org/maven2/com/starrocks) 获取不同版本的 connector jar。
+
+#### Maven 依赖
+
+依赖配置的格式如下，需要将 `spark_version`、`scala_version` 和 `connector_version` 替换成对应的版本。
+
+```xml
+<dependency>
+  <groupId>com.starrocks</groupId>
+  <artifactId>starrocks-spark-connector-${spark_version}_${scala_version}</artifactId>
+  <version>${connector_version}</version>
+</dependency>
+```
+比如，想在 Spark 3.2 和 scala 2.12 上使用 1.1.0 版本的 connector，可以添加如下依赖
+
+```xml
+<dependency>
+  <groupId>com.starrocks</groupId>
+  <artifactId>starrocks-spark-connector-3.2_2.12</artifactId>
+  <version>1.1.0</version>
+</dependency>
+```
+
+#### 手动编译
+
+1. 下载 [Spark 连接器代码](https://github.com/StarRocks/starrocks-connector-for-apache-spark)。
+
+2. 通过如下命令进行编译，需要将 `spark_version` 替换成相应的 Spark 版本
+
+      ```shell
+      sh build.sh <spark_version>
+      ```
+
+   比如，在 Spark 3.2 上使用，命令如下
+
+      ```shell
+      sh build.sh 3.2
+      ```
+
+3. 编译完成后，`target/` 目录下会生成 connector jar 包，比如 `starrocks-spark-connector-3.2_2.12-1.1.0-SNAPSHOT.jar`。
+> **_注意:_** 非正式发布的connector版本会带有`SNAPSHOT`后缀
+
+
+### 1.0.0 版本
+
+#### 直接下载
 
 - [Spark 2.x](https://cdn-thirdparty.starrocks.com/spark/starrocks-spark2_2.11-1.0.0.jar)
 - [Spark 3.x](https://cdn-thirdparty.starrocks.com/spark/starrocks-spark3_2.12-1.0.0.jar)
 
-### 手动编译
+#### 手动编译
 
-1. 下载 [Spark 连接器代码](https://github.com/StarRocks/starrocks-connector-for-apache-spark)。
+1. 下载 [Spark 连接器代码](https://github.com/StarRocks/starrocks-connector-for-apache-spark/tree/spark-1.0)。
+> **_注意:_** 需要切换到 `spark-1.0` 分支。
 
 2. 通过如下命令进行 Spark 连接器的编译：
 
-   - 如果 Spark 版本是 v2.x，则执行如下命令，默认编译的是配套 Spark v2.3.4 的连接器：
+   - 如果 Spark 版本是 2.x，则执行如下命令，默认编译的是配套 Spark v2.3.4 的连接器：
 
      ```Plain
      sh build.sh 2
      ```
 
-   - 如果 Spark 版本是 v3.x，则执行如下命令，默认编译的是配套 Spark v3.1.2 的连接器：
+   - 如果 Spark 版本是 3.x，则执行如下命令，默认编译的是配套 Spark v3.1.2 的连接器：
 
      ```Plain
      sh build.sh 3
@@ -88,11 +149,15 @@ Spark 连接器支持三种数据读取方式：Spark SQL、Spark DataFrame 和 
 
 以下参数仅适用于 Spark SQL 和 Spark DataFrame 读取方式。
 
-| 参数名称                            | 默认值 | 说明                                                         |
-| ----------------------------------- | ------ | ------------------------------------------------------------ |
-| user                                | 无     | StarRocks 集群账号的用户名。                                 |
-| password                            | 无     | StarRocks 集群账号的用户密码。                               |
-| starrocks.filter.query.in.max.count | 100    | 谓词下推中，IN 表达式支持的取值数量上限。如果 IN 表达式中指定的取值数量超过该上限，则 IN 表达式中指定的条件过滤在 Spark 侧处理。 |
+| 参数名称                                | 默认值 | 说明                                                                                                           |
+|-------------------------------------|-----|--------------------------------------------------------------------------------------------------------------|
+| starrocks.fe.http.url               | 无   | FE 的 HTTP 地址，1.1.0版本开始支持，与 `starrocks.fenodes` 等价，两者填一个即可，1.1.0 及以后版本推荐使用该配置，`starrocks.fenodes` 在后续版本可能被淘汰。 |                                                              |
+| starrocks.fe.jdbc.url               | 无   | FE 的 MySQL Server 连接地址。格式为 jdbc:mysql://<fe_host>:<fe_query_port>。**注意：1.1.0 及以后版本必填**。                      |                                                                                                        ||        |                                                              |
+| user                                | 无   | StarRocks 集群账号的用户名。                                                                                          |
+| starrocks.user                      | 无   | StarRocks 集群账号的用户名，1.1.0版本开始支持，与 `user` 等价，两者填一个即可，1.1.0 及以后版本推荐使用该配置，`user` 在后续版本可能被淘汰。                     |
+| password                            | 无   | StarRocks 集群账号的用户密码。                                                                                         |
+| starrocks.password                  | 无   | StarRocks 集群账号的用户密码。 1.1.0版本开始支持，与 `password` 等价，两者填一个即可，1.1.0 及以后版本推荐使用该配置，`password` 在后续版本可能被淘汰。           |
+| starrocks.filter.query.in.max.count | 100 | 谓词下推中，IN 表达式支持的取值数量上限。如果 IN 表达式中指定的取值数量超过该上限，则 IN 表达式中指定的条件过滤在 Spark 侧处理。                                    |
 
 ### Spark RDD 专有参数
 
@@ -106,6 +171,30 @@ Spark 连接器支持三种数据读取方式：Spark SQL、Spark DataFrame 和 
 
 ## 数据类型映射关系
 
+### 1.1.0 及以上版本
+
+| StarRocks 数据类型 | Spark 数据类型              |
+|----------------|-------------------------|
+| BOOLEAN        | DataTypes.BooleanType   |
+| TINYINT        | DataTypes.ByteType      |
+| SMALLINT       | DataTypes.ShortType     |
+| INT            | DataTypes.IntegerType   |
+| BIGINT         | DataTypes.LongType      |
+| LARGEINT       | DataTypes.StringType    |
+| FLOAT          | DataTypes.FloatType     |
+| DOUBLE         | DataTypes.DoubleType    |
+| DECIMAL        | DecimalType             |
+| CHAR           | DataTypes.StringType    |
+| VARCHAR        | DataTypes.StringType    |
+| STRING         | DataTypes.StringType    |
+| DATE           | DataTypes.DateType      |
+| DATETIME       | DataTypes.TimestampType |
+| ARRAY              | Unsupported datatype  |
+| HLL                | Unsupported datatype  |
+| BITMAP             | Unsupported datatype  |
+
+### 1.0.0 版本 
+
 | StarRocks 数据类型 | Spark 数据类型        |
 | ------------------ | --------------------- |
 | BOOLEAN            | DataTypes.BooleanType |
@@ -117,19 +206,32 @@ Spark 连接器支持三种数据读取方式：Spark SQL、Spark DataFrame 和 
 | FLOAT              | DataTypes.FloatType   |
 | DOUBLE             | DataTypes.DoubleType  |
 | DECIMAL            | DecimalType           |
-| DATE               | DataTypes.StringType  |
-| DATETIME           | DataTypes.StringType  |
 | CHAR               | DataTypes.StringType  |
 | VARCHAR            | DataTypes.StringType  |
+| DATE               | DataTypes.StringType  |
+| DATETIME           | DataTypes.StringType  |
 | ARRAY              | Unsupported datatype  |
 | HLL                | Unsupported datatype  |
 | BITMAP             | Unsupported datatype  |
 
 Spark 连接器中，将 DATE 和 DATETIME 数据类型映射为 STRING 数据类型。因为 StarRocks 底层存储引擎处理逻辑，直接使用 DATE 和 DATETIME 数据类型时，覆盖的时间范围无法满足需求。所以，使用 STRING 数据类型直接返回对应的时间可读文本。
 
+## Connector升级
+
+### 1.0.0 升级 1.1.0
+* 1.1.0 版本需要通过 JDBC 访问 StarRocks 以获取更详细的表信息，因此必须配置 `starrocks.fe.jdbc.url`
+* 1.1.0 版本调整了一些参数命名，目前同时保留了调整前后的参数，只需配置一个即可，但是推荐使用新的，旧的参数在之后的版本可能被淘汰
+  * `starrocks.fenodes` 调整为 `starrocks.fe.http.url`
+  * `user` 调整为 `starrocks.user`
+  * `password` 调整为 `starrocks.password`
+* 1.1.0 版本基于 Spark 3.x 调整了部分类型映射
+  * StarRocks的 `DATE` 映射为 Spark 的 `DataTypes.DateType`，原来是 `DataTypes.StringType`
+  * StarRocks的 `DATETIME` 映射为 Spark 的 `DataTypes.TimestampType`，原来是 `DataTypes.StringType`
+
+
 ## 使用示例
 
-假设您的 StarRocks 集群中已创建数据库 `test`，并且您拥有 `root` 账号权限。
+假设您的 StarRocks 集群中已创建数据库 `test`，并且您拥有 `root` 账号权限。示例的参数配置基于 1.1.0 版本。
 
 ### 数据样例
 
@@ -229,9 +331,10 @@ Spark 连接器中，将 DATE 和 DATETIME 数据类型映射为 STRING 数据�
               OPTIONS
               (
                   "starrocks.table.identifier" = "test.score_board",
-                  "starrocks.fenodes" = "<fe_host>:<fe_http_port>",
-                  "user" = "root",
-                  "password" = ""
+                  "starrocks.fe.http.url" = "<fe_host>:<fe_http_port>",
+                  "starrocks.fe.jdbc.url" = "jdbc:mysql://<fe_host>:<fe_query_port>",
+                  "starrocks.user" = "root",
+                  "starrocks.password" = ""
               );
    ```
 
@@ -282,9 +385,10 @@ Spark 连接器中，将 DATE 和 DATETIME 数据类型映射为 STRING 数据�
    ```Scala
    scala> val starrocksSparkDF = spark.read.format("starrocks")
               .option("starrocks.table.identifier", s"test.score_board")
-              .option("starrocks.fenodes", s"<fe_host>:<fe_http_port>")
-              .option("user", s"root")
-              .option("password", s"")
+              .option("starrocks.fe.http.url", s"<fe_host>:<fe_http_port>")
+              .option("starrocks.fe.jdbc.url", s"jdbc:mysql://<fe_host>:<fe_query_port>")
+              .option("starrocks.user", s"root")
+              .option("starrocks.password", s"")
               .load()
    ```
 
