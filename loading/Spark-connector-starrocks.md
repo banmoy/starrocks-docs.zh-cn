@@ -28,7 +28,7 @@ connector jar包的命名格式如下
 
 ### 直接下载
 
-可以在 [Maven Central Repository](https://repo1.maven.org/maven2/com/starrocks/starrocks-stream-load-sdk) 获取不同版本的 connector jar。
+可以在 [Maven Central Repository](https://repo1.maven.org/maven2/com/starrocks) 获取不同版本的 connector jar。
 
 ### Maven 依赖
 
