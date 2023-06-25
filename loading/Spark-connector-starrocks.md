@@ -1,6 +1,6 @@
 # 从 Apache Spark™ 导入
 
-StarRocks 提供 Apache Spark™ 连接器 (StarRocks Connector for Apache Spark™)，可以通过 Spark 导入数据至 StarRocks。
+StarRocks 提供 Apache Spark™ 连接器 (StarRocks Connector for Apache Spark™)，可以通过 Spark 导入数据至 StarRocks（推荐）。
 基本原理是对数据攒批后，通过 [Stream Load](./StreamLoad.md) 批量导入StarRocks。Connector 导入数据基于Spark DataSource V2 实现，
 可以通过 Spark DataFrame 或 Spark SQL 创建 DataSource，支持 Batch 和 Structured Streaming。
 
