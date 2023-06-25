@@ -202,7 +202,7 @@ MySQL [test]> SELECT * FROM `score_board`;
 ```scala
 import org.apache.spark.sql.types.StructType
 
-// 1. create a DataFrame from a sequence
+// 1. create a DataFrame from csv
 val schema = (new StructType()
         .add("id", "integer")
         .add("name", "string")
@@ -212,7 +212,7 @@ val df = (spark.readStream
         .option("sep", ",")
         .schema(schema)
         .format("csv") 
-        // replace it with you path to the directory "csv-data"
+        // replace it with your path to the directory "csv-data"
         .load("/path/to/csv-data")
      )
 
@@ -223,7 +223,7 @@ val query = (df.writeStream.format("starrocks")
         .option("starrocks.table.identifier", "test.score_board")
         .option("starrocks.user", "root")
         .option("starrocks.password", "")
-        // replace it with you checkpoint directory
+        // replace it with your checkpoint directory
         .option("checkpointLocation", "/path/to/checkpoint")
         .outputMode("append")
         .start()
