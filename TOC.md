@@ -53,7 +53,7 @@
   + [从 Apache Kafka® 持续导入](/loading/RoutineLoad.md)
   + 使用 Apache Spark™ 导入
     + [使用 Spark connector（推荐）](/loading/Spark-connector-starrocks.md)
-    + [使用 Spark Load]](/loading/SparkLoad.md)
+    + [使用 Spark Load](/loading/SparkLoad.md)
   + [使用 INSERT 语句导入](/loading/InsertInto.md)
   + [使用 Stream Load 事务接口导入](/loading/Stream_Load_transaction_interface.md)
   + [从 MySQL 实时同步](/loading/Flink_cdc_load.md)
