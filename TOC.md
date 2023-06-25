@@ -52,7 +52,7 @@
   + [从 HDFS 或外部云存储系统导入](/loading/BrokerLoad.md)
   + [从 Apache Kafka® 持续导入](/loading/RoutineLoad.md)
   + 使用 Apache Spark™ 导入
-    + [使用 Spark connector](/loading/Spark-connector-starrocks.md)
+    + [使用 Spark connector（推荐）](/loading/Spark-connector-starrocks.md)
     + [使用 Spark Load]](/loading/SparkLoad.md)
   + [使用 INSERT 语句导入](/loading/InsertInto.md)
   + [使用 Stream Load 事务接口导入](/loading/Stream_Load_transaction_interface.md)
